@@ -1,45 +1,57 @@
 package com.und.security.service
 
-import com.und.security.model.redis.JWTKeys
-import com.und.repository.JWTKeyRepository
-import com.und.security.model.UndUserDetails
-import com.und.security.model.User
-import com.und.security.utils.KEYTYPE
-import com.und.security.utils.RestTokenUtil
-import com.und.security.utils.RestUserFactory
+import com.und.security.model.redis.UserCache
+import com.und.repository.UserCacheRepository
+import com.und.security.repository.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.mobile.device.Device
 import org.springframework.stereotype.Service
 
 @Service
 class JWTKeyService {
 
     @Autowired
-    lateinit var jwtKeyRepository: JWTKeyRepository
+    lateinit var userCacheRepository: UserCacheRepository
+
+    @Autowired
+    lateinit var userRepository: UserRepository
 
 
-    fun updateJwt(jwt: JWTKeys): JWTKeys {
+    fun updateJwt(jwt: UserCache): UserCache {
         //TODO fix updating only what is required
-        return jwtKeyRepository.save(jwt)
+        return userCacheRepository.save(jwt)
 
     }
 
 
-    fun getKeyIfExists(userId: Long): JWTKeys {
+    fun getKeyIfExists(userId: Long): UserCache {
         val cacheKey = generateIdKey(userId)
-        val jwtOption = jwtKeyRepository.findById(cacheKey)
-        return if (jwtOption.isPresent) {
-            jwtOption.get()
-        } else {
-            JWTKeys(secret = "")
+        val jwtOption = userCacheRepository.findById(cacheKey)
+        return if (!jwtOption.isPresent) {
+            val jwtKeys =  UserCache(secret = "", userId = generateIdKey(userId))
+            val user = userRepository.findById(userId)
+            if(user.isPresent) {
+                with(jwtKeys) {
+                    this.userId = generateIdKey(userId)
+                    this.secret = user.get().clientSecret
+                    this.loginKey = user.get().key
+                    this.username = user.get().username
+                    this.password = user.get().password
+                    this.email = user.get().email
+                    this.clientId = "${user.get().client?.id?:-1}"
+                }
+            }
+            save(jwtKeys)
+            jwtKeys
 
+        } else {
+            jwtOption.get()
         }
 
 
     }
 
-    fun save(jwt: JWTKeys) {
-        jwtKeyRepository.save(jwt)
+    fun save(jwt: UserCache) {
+        userCacheRepository.save(jwt)
     }
 
     private fun generateIdKey(userId: Long): String = "$userId"

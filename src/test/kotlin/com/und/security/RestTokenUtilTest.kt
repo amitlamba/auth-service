@@ -1,24 +1,19 @@
 package com.und.security
 
-import com.nhaarman.mockito_kotlin.whenever
 import com.und.common.utils.DateUtils
-import com.und.repository.JWTKeyRepository
 import com.und.security.model.AuthorityName
 import com.und.security.model.UndUserDetails
-import com.und.security.model.redis.JWTKeys
+import com.und.security.model.redis.UserCache
 import com.und.security.service.JWTKeyService
 import com.und.security.utils.KEYTYPE
 import com.und.security.utils.KeyResolver
 import com.und.security.utils.RestTokenUtil
-import io.jsonwebtoken.Claims
-import io.jsonwebtoken.impl.DefaultJwsHeader
 import io.jsonwebtoken.impl.TextCodec
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.util.DateUtil
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
@@ -125,11 +120,13 @@ class RestTokenUtilTest {
                 clientId = 1,
                 authorities = arrayListOf(SimpleGrantedAuthority(AuthorityName.ROLE_ADMIN.name), SimpleGrantedAuthority(AuthorityName.ROLE_EVENT.name))
         )
-        val jwtKey = JWTKeys(secret = secret)
+        val jwtKey = UserCache(secret = secret, userId = "${user.id}")
         with(jwtKey) {
             username = user.username
             secret = user.secret
             password = user.password ?: ""
+            clientId = "${user.clientId}"
+            email = user.email?:"not available"
 
         }
         val device = DeviceMock()

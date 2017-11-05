@@ -1,5 +1,6 @@
 package com.und.security.service
 
+import com.und.repository.UserCacheRepository
 import com.und.security.utils.RestUserFactory
 import com.und.security.repository.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,8 +18,12 @@ class UNDUserDetailsService : UserDetailsService {
     @Autowired
     lateinit private var userRepository: UserRepository
 
+    @Autowired
+    lateinit private var userCacheRepository: UserCacheRepository
+
     @Throws(UsernameNotFoundException::class)
     override fun loadUserByUsername(username: String): UserDetails {
+        //userCacheRepository.findByUserName()
         val user = userRepository.findByUsername(username)
 
         return if (user == null) {

@@ -1,25 +1,39 @@
 package com.und.security.model.redis
 
+import com.und.security.model.Authority
 import org.springframework.data.annotation.Id
 import org.springframework.data.redis.core.RedisHash
 
-@RedisHash("jwtKeys")
-class JWTKeys {
+@RedisHash("user")
+class UserCache {
 
     constructor()
 
-    constructor(secret: String) {
+    constructor(secret: String, userId: String) {
+        this.userId = userId
         this.secret = secret
     }
 
     @Id
     lateinit var userId: String
 
-    lateinit var secret: String
+    lateinit var  clientId: String
+
+    lateinit var email: String
 
     lateinit var username: String
 
+    lateinit var secret: String
+
     lateinit var password: String
+
+    var firstname: String? = null
+
+    var lastname: String? = null
+
+    var authorities: List<Authority> = arrayListOf()
+
+    var enabled: Boolean = true
 
     var loginKey: String? = null
 

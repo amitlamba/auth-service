@@ -3,7 +3,7 @@ package com.und.security.service
 import com.und.common.utils.usernameFromEmailAndType
 import com.und.security.model.UndUserDetails
 import com.und.security.model.User
-import com.und.security.model.redis.JWTKeys
+import com.und.security.model.redis.UserCache
 import com.und.security.repository.UserRepository
 import com.und.security.utils.KEYTYPE
 import com.und.security.utils.RestTokenUtil
@@ -46,7 +46,7 @@ class UserService {
 
 
     fun resetPassword(userDetails: UndUserDetails, password:String) {
-        fun resetKeys(jwtToken:JWTKeys) {
+        fun resetKeys(jwtToken: UserCache) {
 
             jwtToken.pswrdRstKey = null
             jwtToken.loginKey = null
@@ -62,19 +62,19 @@ class UserService {
         }
     }
 
-    fun generateJwtForForgotPassword(email: String, device: Device): JWTKeys {
+    fun generateJwtForForgotPassword(email: String, device: Device): UserCache {
         return generateJwtLogin(email, device, KEYTYPE.PASSWORD_RESET)
     }
 
-    private fun generateJwtLogin(username: String, device: Device): JWTKeys {
+    private fun generateJwtLogin(username: String, device: Device): UserCache {
         return generateJwtLogin(username, device, KEYTYPE.LOGIN)
     }
 
-    private fun generateJwtLogin(username: String, device: Device, keytype: KEYTYPE): JWTKeys {
+    private fun generateJwtLogin(username: String, device: Device, keytype: KEYTYPE): UserCache {
         // Reload password post-security so we can generate token
         val user = findByUsername(username)
         return if (user != null) {
             restTokenUtil.generateJwtByUser(user, device, keytype)
-        } else JWTKeys()
+        } else UserCache()
     }
 }

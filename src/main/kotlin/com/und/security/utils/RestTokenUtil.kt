@@ -4,7 +4,7 @@ import com.und.common.utils.DateUtils
 import com.und.common.utils.loggerFor
 import com.und.security.model.UndUserDetails
 import com.und.security.model.User
-import com.und.security.model.redis.JWTKeys
+import com.und.security.model.redis.UserCache
 import com.und.security.service.JWTKeyService
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
@@ -35,7 +35,7 @@ class RestTokenUtil {
     /**
      * use this method when you just need to validate that token is valid, even if it has been removed from database
      */
-    fun validateToken(token: String): Pair<UndUserDetails?, JWTKeys> {
+    fun validateToken(token: String): Pair<UndUserDetails?, UserCache> {
         fun getClaimsFromToken(token: String): Claims {
             return Jwts.parser()
                     .setSigningKeyResolver(keyResolver)
@@ -44,7 +44,7 @@ class RestTokenUtil {
 
         }
 
-        fun buildUserDetails(claims: Claims, jwtDetails: JWTKeys): UndUserDetails? {
+        fun buildUserDetails(claims: Claims, jwtDetails: UserCache): UndUserDetails? {
             val userId = claims[CLAIM_USER_ID].toString().toLong()
             return UndUserDetails(
                     id = userId,
@@ -62,7 +62,7 @@ class RestTokenUtil {
             val jwtDetails = getJwtIfExists(userId.toLong())
             val userDetails = buildUserDetails(claims, jwtDetails)
             if (!claims.isTokenExpired) Pair(userDetails, jwtDetails) else Pair(null, jwtDetails)
-        } else Pair(null, JWTKeys())
+        } else Pair(null, UserCache())
 
     }
 
@@ -70,7 +70,7 @@ class RestTokenUtil {
     /**
      * use this method when you need to validate that token is validas well as exists in database
      */
-    fun validateTokenForKeyType(token: String, keyType: KEYTYPE): Pair<UndUserDetails?, JWTKeys> {
+    fun validateTokenForKeyType(token: String, keyType: KEYTYPE): Pair<UndUserDetails?, UserCache> {
         val (user, jwtDetails) = validateToken(token)
         val matches: Boolean = when (keyType) {
             KEYTYPE.LOGIN -> jwtDetails.loginKey == token
@@ -81,11 +81,11 @@ class RestTokenUtil {
 
     }
 
-    fun getJwtIfExists(userId: Long): JWTKeys {
+    fun getJwtIfExists(userId: Long): UserCache {
         return jwtKeyService.getKeyIfExists(userId)
     }
 
-    fun updateJwt(jwt: JWTKeys): JWTKeys {
+    fun updateJwt(jwt: UserCache): UserCache {
         return jwtKeyService.updateJwt(jwt)
     }
 
@@ -93,7 +93,7 @@ class RestTokenUtil {
      * used to generate a token for keytype options,
      * user object should have, id, secret, username and password present
      */
-    fun generateJwtByUser(user: User, device: Device, keyType: KEYTYPE): JWTKeys {
+    fun generateJwtByUser(user: User, device: Device, keyType: KEYTYPE): UserCache {
         val userDetails = RestUserFactory.create(user)
         return generateJwtByUserDetails(userDetails, device, keyType)
     }
@@ -103,9 +103,9 @@ class RestTokenUtil {
      * userDetails object should have, id, secret, username and password present
      * tries to get jwt object from cache, and updates requested key type if it exists else makes a new entry
      */
-    fun generateJwtByUserDetails(user: UndUserDetails, device: Device, keyType: KEYTYPE): JWTKeys {
+    fun generateJwtByUserDetails(user: UndUserDetails, device: Device, keyType: KEYTYPE): UserCache {
 
-        fun buildKey(): JWTKeys {
+        fun buildKey(): UserCache {
             return if (user.id != null) {
                 val jwt = getJwtIfExists(user.id)
                 with(jwt) {
@@ -118,9 +118,11 @@ class RestTokenUtil {
                     this.secret = user.secret
                     this.username = user.username
                     this.password = user.password!!
+                    this.email = user.email?: "Notfound"
+                    this.clientId = "${user.clientId}"
                 }
                 jwt
-            } else JWTKeys()
+            } else UserCache()
 
         }
 

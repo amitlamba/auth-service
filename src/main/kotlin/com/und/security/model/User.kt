@@ -65,7 +65,6 @@ class User {
 
     @Column(name = "SECRET", length = 255)
     @NotNull
-    @ColumnDefault("'mySecret'")
     @Size(min = 4, max = 255)
     lateinit var clientSecret: String
 
