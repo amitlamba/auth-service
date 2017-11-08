@@ -1,6 +1,6 @@
 buildscript {
     ext.kotlin_version = '1.1.51'
-    ext.spring_boot_version = '2.0.0.M3'
+    ext.spring_boot_version = '2.0.0.M5'
     repositories {
         mavenCentral()
         maven { url 'https://repo.spring.io/libs-snapshot' }
@@ -35,7 +35,7 @@ jacocoTestReport {
     reports {
         xml.enabled
         csv.enabled
-        html.destination file("${buildDir}/reports/jacocoHtml")
+        html.destination file("${buildDir}/reports/jacoco.Html")
     }
 }
 tasks.withType(FindBugs) {
@@ -44,7 +44,7 @@ tasks.withType(FindBugs) {
         html.enabled = true
         reportLevel = "low"
         ignoreFailures = true
-        html.destination file("${buildDir}/reports/findBugsHtml")
+        html.destination file("${buildDir}/reports/findBugs.Html")
     }
 }
 
@@ -56,7 +56,7 @@ ext {
     javaxElVersion = '2.2.1-b04'
     bitWalkerUagentVersion = '1.20'
     kotlinVersion = '1.1.51'
-    springbootVersion = '2.0.0.M3'
+    springbootVersion = '2.0.0.M5'
     aspectjVersion = '1.8.7'
     jsonPathVersion = '2.1.0'
     swaggerVersion = '2.7.0'
@@ -98,10 +98,10 @@ dependencies {
     )
     testCompile 'org.mockito:mockito-core:1.+'
     testCompile group: 'com.nhaarman', name: 'mockito-kotlin', version: '1.5.0'
-    testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.0.0.M3') {
+    testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test') {
         exclude(module: 'commons-logging')
     }
-    testCompile('org.springframework.cloud:spring-cloud-starter-eureka-server')
+
     compile(
             //"org.springframework.boot:spring-boot-starter-web:$springbootVersion",
             "org.springframework.boot:spring-boot-starter-data-jpa",
@@ -126,14 +126,14 @@ dependencies {
 
     compile('org.springframework.cloud:spring-cloud-starter-config')
     compile('org.springframework.cloud:spring-cloud-config-client')
-    compile('org.springframework.cloud:spring-cloud-starter-eureka')
+    compile('org.springframework.cloud:spring-cloud-starter-eureka:2.0.0.M2')
 
 
 }
 
 dependencyManagement {
     imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:Finchley.M2"
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:Finchley.M3"
     }
 }
 
