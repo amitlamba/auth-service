@@ -7,10 +7,10 @@
     </encoder>
   </appender>
 
-  <logger name="com.und" level="INFO" />
-  <logger name="org.springframework" level="INFO" />
+  <logger name="com.und" level="DEBUG" />
+  <logger name="org.springframework" level="WARN" />
 
-  <root level="INFO">
+  <root level="WARN">
     <appender-ref ref="STDOUT" />
   </root>
 
