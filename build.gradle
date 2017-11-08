@@ -1,6 +1,6 @@
 buildscript {
     ext.kotlin_version = '1.1.51'
-    ext.spring_boot_version = '2.0.0.M5'
+    ext.spring_boot_version = '2.0.0.M3'
     repositories {
         mavenCentral()
         maven { url 'https://repo.spring.io/libs-snapshot' }
@@ -42,7 +42,7 @@ tasks.withType(FindBugs) {
     reports {
         xml.enabled = false
         html.enabled = true
-        reportLevel = "low"
+        //reportLevel = "low"
         ignoreFailures = true
         html.destination file("${buildDir}/reports/findBugs.Html")
     }
@@ -56,7 +56,7 @@ ext {
     javaxElVersion = '2.2.1-b04'
     bitWalkerUagentVersion = '1.20'
     kotlinVersion = '1.1.51'
-    springbootVersion = '2.0.0.M5'
+    springbootVersion = '2.0.0.M3'
     aspectjVersion = '1.8.7'
     jsonPathVersion = '2.1.0'
     swaggerVersion = '2.7.0'
@@ -109,8 +109,8 @@ dependencies {
             "org.springframework.boot:spring-boot-starter-security",
             "org.springframework.boot:spring-boot-actuator",
             "org.springframework.boot:spring-boot-starter-mobile",
-            "org.aspectj:aspectjrt:$aspectjVersion",
-            "org.aspectj:aspectjweaver:$aspectjVersion",
+            "org.aspectj:aspectjrt",
+            "org.aspectj:aspectjweaver",
             "org.postgresql:postgresql:$pgDriverVersion",
             "io.jsonwebtoken:jjwt:$jjwtVersion",
             "io.springfox:springfox-swagger2:$swaggerVersion",
@@ -133,7 +133,7 @@ dependencies {
 
 dependencyManagement {
     imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:Finchley.M3"
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:Finchley.M2"
     }
 }
 
