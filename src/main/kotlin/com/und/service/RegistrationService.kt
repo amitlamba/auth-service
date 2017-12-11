@@ -99,7 +99,7 @@ class RegistrationService {
             phone = registrationRequest.phone
             name = registrationRequest.name
             firstname = registrationRequest.firstName
-            lastname = registrationRequest.lastname
+            lastname = registrationRequest.lastName
             address = registrationRequest.address
             country = registrationRequest.country
             dateModified = DateUtils().now()

@@ -33,7 +33,7 @@ class RegistrationRequest {
     var firstName: String? = null
 
     @Size(min = 0, max = 255, message = "Last Name should contain 0 to 255 characters")
-    var lastname: String? = null
+    var lastName: String? = null
 
 
 }
