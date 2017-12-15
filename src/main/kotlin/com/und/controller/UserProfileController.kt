@@ -17,6 +17,7 @@ import org.springframework.mobile.device.Device
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
+@CrossOrigin(origins= arrayOf("*"), maxAge = 3600)
 @RestController
 @RequestMapping("/setting")
 class UserProfileController {

@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.web.bind.annotation.*
 
+@CrossOrigin
 @RestController
 class AuthenticationRestController {
 
