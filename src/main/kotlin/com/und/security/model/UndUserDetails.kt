@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.User
  * Created by shiv on 21/07/17.
  */
 class UndUserDetails(
-        @get:JsonIgnore
+       // @get:JsonIgnore
         val id: Long?,
 
         val clientId : Long?,
