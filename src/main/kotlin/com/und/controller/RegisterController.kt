@@ -58,19 +58,19 @@ class RegisterController {
         registrationService.sendVerificationEmail(client)
     }
 
-    @RequestMapping(value = "/verifyemail/{email}/{code}", method = arrayOf(RequestMethod.GET))
+    @RequestMapping(value = "/verifyemail/{email:.+}/{code}", method = arrayOf(RequestMethod.GET))
     fun verifyEmail(@PathVariable email: String, @PathVariable code: String) {
         registrationService.verifyEmail(email,code)
 
     }
 
-    @RequestMapping(value = "/sendvfnmail/{email}", method = arrayOf(RequestMethod.GET))
+    @RequestMapping(value = "/sendvfnmail/{email:.+}", method = arrayOf(RequestMethod.GET))
     fun newverifyEmail(@PathVariable email: String) {
         registrationService.sendReVerificationEmail(email)
 
     }
 
-    @RequestMapping(value = "/forgotpassword/{email}", method = arrayOf(RequestMethod.GET))
+    @RequestMapping(value = "/forgotpassword/{email:.+}", method = arrayOf(RequestMethod.GET))
     fun forgotPassword(@PathVariable email: String, device: Device): ResponseEntity<Response> {
         val code = userService.generateJwtForForgotPassword(email, device)
         emailService.sendEmail(EmailMessage(
