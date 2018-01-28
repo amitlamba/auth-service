@@ -38,10 +38,10 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
 
 
     @Autowired
-    lateinit private var unauthorizedHandler: RestAuthenticationEntryPoint
+    private lateinit var unauthorizedHandler: RestAuthenticationEntryPoint
 
     @Autowired
-    lateinit private var userDetailsService: UNDUserDetailsService
+    private lateinit var userDetailsService: UNDUserDetailsService
 
     @LoadBalanced
     @Bean
@@ -112,6 +112,8 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
                         "/login",
                         "/register",
                         "/health",
+                        "/segment/**",
+                        "/location/**",
                         "/info"
                 ).permitAll()
                 .antMatchers("/auth/**").permitAll()
