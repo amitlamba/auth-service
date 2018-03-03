@@ -96,7 +96,7 @@ class AuthenticationRestController {
     fun userByName(@PathVariable("name") name: String, device: Device): ResponseEntity<*> {
         //FIXME check for authentication token of service in header
         val userDetails = userDetailsService.loadUserByUsername(name)
-        return if (userDetails?.name != null) {
+        return if (userDetails?.username != null) {
             ResponseEntity.ok(Response(
                     status = ResponseStatus.SUCCESS,
                     data = Data(userDetails)
