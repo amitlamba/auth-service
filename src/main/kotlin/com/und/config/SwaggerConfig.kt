@@ -1,3 +1,4 @@
+/*
 package com.und.config
 
 
@@ -18,9 +19,11 @@ import springfox.documentation.service.Contact
 import springfox.documentation.service.ResponseMessage
 
 
+*/
 /**
  * Created by shiv on 21/07/17.
- */
+ *//*
+
 @Configuration
 @EnableSwagger2
 class SwaggerConfig {
@@ -56,4 +59,4 @@ class SwaggerConfig {
                 "License of API",
                 "http://userndot.com/v1/api/licence", arrayListOf())
     }
-}
+}*/
