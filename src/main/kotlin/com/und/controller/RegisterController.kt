@@ -71,8 +71,8 @@ class RegisterController {
     }
 
     @RequestMapping(value = "/forgotpassword/{email:.+}", method = arrayOf(RequestMethod.GET))
-    fun forgotPassword(@PathVariable email: String, device: Device): ResponseEntity<Response> {
-        val code = userService.generateJwtForForgotPassword(email, device)
+    fun forgotPassword(@PathVariable email: String): ResponseEntity<Response> {
+        val code = userService.generateJwtForForgotPassword(email)
         emailService.sendEmail(EmailMessage(
                 from = "",
                 to = "",

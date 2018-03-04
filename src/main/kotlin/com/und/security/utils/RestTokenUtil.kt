@@ -93,9 +93,9 @@ class RestTokenUtil {
      * used to generate a token for keytype options,
      * user object should have, id, secret, username and password present
      */
-    fun generateJwtByUser(user: User, device: Device, keyType: KEYTYPE): UserCache {
+    fun generateJwtByUser(user: User,  keyType: KEYTYPE): UserCache {
         val userDetails = RestUserFactory.create(user)
-        return generateJwtByUserDetails(userDetails, device, keyType)
+        return generateJwtByUserDetails(userDetails, keyType)
     }
 
     /**
@@ -103,7 +103,7 @@ class RestTokenUtil {
      * userDetails object should have, id, secret, username and password present
      * tries to get jwt object from cache, and updates requested key type if it exists else makes a new entry
      */
-    fun generateJwtByUserDetails(user: UndUserDetails, device: Device, keyType: KEYTYPE): UserCache {
+    fun generateJwtByUserDetails(user: UndUserDetails, keyType: KEYTYPE): UserCache {
 
         fun buildKey(): UserCache {
             return if (user.id != null) {
@@ -111,9 +111,9 @@ class RestTokenUtil {
                 with(jwt) {
                     userId = "${user.id}"
                     when (keyType) {
-                        com.und.security.utils.KEYTYPE.LOGIN -> loginKey = generateToken(user, device)
-                        com.und.security.utils.KEYTYPE.PASSWORD_RESET -> pswrdRstKey = generateToken(user, device)
-                        com.und.security.utils.KEYTYPE.REGISTRATION -> emailRgstnKey = generateToken(user, device)
+                        com.und.security.utils.KEYTYPE.LOGIN -> loginKey = generateToken(user)
+                        com.und.security.utils.KEYTYPE.PASSWORD_RESET -> pswrdRstKey = generateToken(user)
+                        com.und.security.utils.KEYTYPE.REGISTRATION -> emailRgstnKey = generateToken(user)
                     }
                     this.secret = user.secret
                     this.username = user.username
@@ -132,20 +132,20 @@ class RestTokenUtil {
     }
 
 
-    inline private fun generateToken(userDetails: UndUserDetails, device: Device): String {
+    inline private fun generateToken(userDetails: UndUserDetails): String {
 
-        val audience = when {
+/*        val audience = when {
             device.isNormal -> AUDIENCE_WEB
             device.isMobile -> AUDIENCE_MOBILE
             device.isTablet -> AUDIENCE_TABLET
             else -> AUDIENCE_UNKNOWN
-        }
+        }*/
 
         val createdDate = dateUtils.now()
 
         val claims = mapOf(
                 CLAIM_KEY_USERNAME to userDetails.username,
-                CLAIM_KEY_AUDIENCE to audience,
+                //CLAIM_KEY_AUDIENCE to audience,
                 CLAIM_USER_ID to userDetails.id.toString(),
                 CLAIM_CLIENT_ID to userDetails.clientId.toString(),
                 CLAIM_ROLES to userDetails.authorities.map { auth -> auth.authority },

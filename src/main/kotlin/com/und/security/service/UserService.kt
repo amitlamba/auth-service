@@ -32,10 +32,10 @@ class UserService {
 
     }
 
-    fun updateJwtOfEventUser(device: Device, adminUser: UndUserDetails): Int {
+    fun updateJwtOfEventUser( adminUser: UndUserDetails): Int {
         //FIXME usernameFromEmailAndType method need fix and not required here
         val username = usernameFromEmailAndType(adminUser.username, 2)
-        val jwt = generateJwtLogin(username, device)
+        val jwt = generateJwtLogin(username)
         val updatedCount = userRepository.updateJwtOfEventUser(jwt.loginKey?:"", username)
         restTokenUtil.updateJwt(jwt)
         return updatedCount
@@ -62,19 +62,19 @@ class UserService {
         }
     }
 
-    fun generateJwtForForgotPassword(email: String, device: Device): UserCache {
-        return generateJwtLogin(email, device, KEYTYPE.PASSWORD_RESET)
+    fun generateJwtForForgotPassword(email: String): UserCache {
+        return generateJwtLogin(email, KEYTYPE.PASSWORD_RESET)
     }
 
-    private fun generateJwtLogin(username: String, device: Device): UserCache {
-        return generateJwtLogin(username, device, KEYTYPE.LOGIN)
+    private fun generateJwtLogin(username: String): UserCache {
+        return generateJwtLogin(username, KEYTYPE.LOGIN)
     }
 
-    private fun generateJwtLogin(username: String, device: Device, keytype: KEYTYPE): UserCache {
+    private fun generateJwtLogin(username: String, keytype: KEYTYPE): UserCache {
         // Reload password post-security so we can generate token
         val user = findByUsername(username)
         return if (user != null) {
-            restTokenUtil.generateJwtByUser(user, device, keytype)
+            restTokenUtil.generateJwtByUser(user, keytype)
         } else UserCache()
     }
 }

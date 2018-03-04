@@ -12,9 +12,13 @@ import com.und.security.service.JWTKeyService
 import com.und.security.service.UserService
 import com.und.security.utils.AuthenticationUtils
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.mobile.device.Device
+import org.springframework.mobile.device.DeviceUtils
 import org.springframework.web.bind.annotation.*
+import sun.plugin2.main.server.JVMHealthData
+import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
 
 @CrossOrigin(origins= arrayOf("*"), maxAge = 3600)
@@ -91,9 +95,10 @@ class UserProfileController {
 
 
     @RequestMapping(value = "/refreshToken", method = arrayOf(RequestMethod.POST))
-    fun generateToken(device: Device): ResponseEntity<*> {
+    fun generateToken(): ResponseEntity<*> {
+        //val device = DeviceUtils.getCurrentDevice(request)
         val user = AuthenticationUtils.principal
-        val jwt = userService.updateJwtOfEventUser(device, user)
+        val jwt = userService.updateJwtOfEventUser( user)
         return ResponseEntity.ok(jwt)
     }
 

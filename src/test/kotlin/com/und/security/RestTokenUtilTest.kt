@@ -134,7 +134,7 @@ class RestTokenUtilTest {
         `when`(restTokenUtil.getJwtIfExists(user.id!!))
                 .thenReturn(jwtKey)
 
-        val jwtKeys = restTokenUtil.generateJwtByUserDetails(user, device, KEYTYPE.LOGIN)
+        val jwtKeys = restTokenUtil.generateJwtByUserDetails(user, KEYTYPE.LOGIN)
         return jwtKeys.loginKey ?: ""
     }
 
