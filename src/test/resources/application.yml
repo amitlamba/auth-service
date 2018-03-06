@@ -20,6 +20,9 @@ spring:
     driver-class-name: org.postgresql.Driver
     username: postgres
     password:  postgres
+  redis:
+    host:
+    port:
 
 security:
   header:
