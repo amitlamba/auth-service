@@ -1,7 +1,6 @@
 package com.und.security.utils
 
 import com.und.common.utils.DateUtils
-import com.und.security.model.AuthorityName
 import io.jsonwebtoken.Claims
 import java.util.*
 

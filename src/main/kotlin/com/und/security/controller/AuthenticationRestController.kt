@@ -11,15 +11,12 @@ import com.und.security.utils.RestTokenUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.mobile.device.Device
-import org.springframework.mobile.device.DeviceUtils
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.web.bind.annotation.*
-import javax.servlet.http.HttpServletRequest
 
 @CrossOrigin
 @RestController
@@ -27,15 +24,15 @@ class AuthenticationRestController {
 
 
     @Autowired
-    lateinit private var authenticationManager: AuthenticationManager
+    private lateinit var authenticationManager: AuthenticationManager
 
     @Autowired
-    lateinit private var userDetailsService: UserDetailsService
+    private lateinit var userDetailsService: UserDetailsService
 
     @Autowired
-    lateinit private var restTokenUtil: RestTokenUtil
+    private lateinit var restTokenUtil: RestTokenUtil
 
-    @RequestMapping(value = "\${security.route.authentication.path}", method = arrayOf(RequestMethod.POST))
+    @PostMapping(value = ["\${security.route.authentication.path}"])
     @Throws(AuthenticationException::class)
     fun createAuthenticationToken(@RequestBody authenticationRequest: RestAuthenticationRequest): ResponseEntity<*> {
         fun generateJwtByUser(username: String): String {
@@ -46,7 +43,6 @@ class AuthenticationRestController {
             } else ""
         }
 
-        return try {
             val authentication = authenticationManager.authenticate(
                     UsernamePasswordAuthenticationToken(
                             authenticationRequest.username,
@@ -55,26 +51,21 @@ class AuthenticationRestController {
             )
             SecurityContextHolder.getContext().authentication = authentication
             val token = generateJwtByUser(authenticationRequest.username ?: "")
-            ResponseEntity.ok(
+           return  ResponseEntity.ok(
                     Response(
                             status = ResponseStatus.SUCCESS,
                             data = Data(SecurityAuthenticationResponse(token))
                     )
             )
-        } catch (exception: AuthenticationException) {
-            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Response(
-                    status = ResponseStatus.FAIL,
-                    message = "Invalid Username/Password"
-            ))
-        }
+
 
 
     }
 
-    @RequestMapping(value = "\${security.route.authentication.path}/validate/{authToken}", method = arrayOf(RequestMethod.GET))
+    @GetMapping(value = ["\${security.route.authentication.path}/validate/{authToken}"])
     @Throws(AuthenticationException::class)
     fun authenticationToken(@PathVariable("authToken") authToken: String): ResponseEntity<*> {
-        val (userDetails, jwtToken) = restTokenUtil.validateTokenForKeyType(authToken, KEYTYPE.LOGIN)
+        val (userDetails, _) = restTokenUtil.validateTokenForKeyType(authToken, KEYTYPE.LOGIN)
         return if (userDetails?.id != null) {
             ResponseEntity.ok(Response(
                     status = ResponseStatus.SUCCESS,
@@ -91,7 +82,7 @@ class AuthenticationRestController {
     }
 
 
-    @RequestMapping(value = "\${security.route.authentication.path}/userdetail/{name}", method = arrayOf(RequestMethod.GET))
+    @GetMapping(value = ["\${security.route.authentication.path}/userdetail/{name}"])
     @Throws(AuthenticationException::class)
     fun userByName(@PathVariable("name") name: String): ResponseEntity<*> {
         //FIXME check for authentication token of service in header

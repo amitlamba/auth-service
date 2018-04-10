@@ -16,7 +16,6 @@ import com.und.service.RegistrationService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.mobile.device.Device
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
@@ -42,12 +41,12 @@ class RegisterController {
     @Autowired
     lateinit var restTokenUtil: RestTokenUtil
 
-    @RequestMapping( method = arrayOf(RequestMethod.GET))
+    @GetMapping
     fun registerForm() {
 
     }
 
-    @RequestMapping( method = arrayOf(RequestMethod.POST))
+    @PostMapping
     fun register(@Valid @RequestBody request: RegistrationRequest) {
         val errors = registrationService.validate(request)
         if (errors.getFieldErrors().isNotEmpty()) {
@@ -58,19 +57,19 @@ class RegisterController {
         registrationService.sendVerificationEmail(client)
     }
 
-    @RequestMapping(value = "/verifyemail/{email:.+}/{code}", method = arrayOf(RequestMethod.GET))
+    @GetMapping(value = ["/verifyemail/{email:.+}/{code}"])
     fun verifyEmail(@PathVariable email: String, @PathVariable code: String) {
-        registrationService.verifyEmail(email,code)
+        registrationService.verifyEmail(email, code)
 
     }
 
-    @RequestMapping(value = "/sendvfnmail/{email:.+}", method = arrayOf(RequestMethod.GET))
+    @GetMapping(value = ["/sendvfnmail/{email:.+}"])
     fun newverifyEmail(@PathVariable email: String) {
         registrationService.sendReVerificationEmail(email)
 
     }
 
-    @RequestMapping(value = "/forgotpassword/{email:.+}", method = arrayOf(RequestMethod.GET))
+    @GetMapping(value = ["/forgotpassword/{email:.+}"])
     fun forgotPassword(@PathVariable email: String): ResponseEntity<Response> {
         val code = userService.generateJwtForForgotPassword(email)
         emailService.sendEmail(EmailMessage(
@@ -83,7 +82,7 @@ class RegisterController {
                 subject = "forgot password"
 
         ))
-        return if(code.pswrdRstKey.isNullOrBlank()) {
+        return if (code.pswrdRstKey.isNullOrBlank()) {
             ResponseEntity.status(HttpStatus.NOT_FOUND).body(Response(
                     message = "Invalid Email Id",
                     status = com.und.model.api.ResponseStatus.FAIL
@@ -96,7 +95,7 @@ class RegisterController {
         }
     }
 
-    @RequestMapping(value = "/resetpassword/{code}", method = arrayOf(RequestMethod.GET))
+    @GetMapping(value = ["/resetpassword/{code}"])
     fun resetPasswordForm(@PathVariable code: String): ResponseEntity<Response> {
         val (userDetails, jwtToken) = restTokenUtil.validateTokenForKeyType(code, KEYTYPE.PASSWORD_RESET)
         return if (userDetails == null || jwtToken.pswrdRstKey != code) {
@@ -115,9 +114,9 @@ class RegisterController {
         }
     }
 
-    @RequestMapping(value = "/resetpassword/{code}", method = arrayOf(RequestMethod.POST))
-    fun resetPassword( @PathVariable code: String,
-                       @RequestBody @Valid passwordRequest: PasswordRequest): ResponseEntity<Response> {
+    @PostMapping(value = ["/resetpassword/{code}"])
+    fun resetPassword(@PathVariable code: String,
+                      @RequestBody @Valid passwordRequest: PasswordRequest): ResponseEntity<Response> {
 
         val (userDetails, jwtToken) = restTokenUtil.validateTokenForKeyType(code, KEYTYPE.PASSWORD_RESET)
         return if (userDetails == null || jwtToken.pswrdRstKey != code) {

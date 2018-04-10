@@ -5,6 +5,7 @@ import com.und.exception.UndBusinessValidationException
 import com.und.model.api.ValidationError
 import io.jsonwebtoken.MalformedJwtException
 import io.jsonwebtoken.SignatureException
+import io.jsonwebtoken.UnsupportedJwtException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
@@ -49,18 +50,20 @@ class RestErrorHandler {
     @ExceptionHandler(AccessDeniedException::class, UsernameNotFoundException::class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
-    fun processAuthEroor(ex: Exception) {
+    fun processAuthEroor(ex: Exception):String {
         logger.debug("Handling INTERNAL SEREVR error")
         logger.error("error occured",ex)
+        return "hello"
 
     }
 
-    @ExceptionHandler(MalformedJwtException::class, SignatureException::class)
+    @ExceptionHandler(MalformedJwtException::class, SignatureException::class,UnsupportedJwtException::class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
-    fun processAuthEroorJwt(ex: Exception) {
+    fun processAuthEroorJwt(ex: Exception):String {
         logger.debug("Handling INTERNAL SEREVR error")
         logger.error("error occured",ex)
+        return "hello"
 
     }
 

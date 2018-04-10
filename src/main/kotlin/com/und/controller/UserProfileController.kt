@@ -8,20 +8,15 @@ import com.und.model.ui.PasswordRequest
 import com.und.model.ui.UserProfileRequest
 import com.und.security.model.Client
 import com.und.security.service.ClientService
-import com.und.security.service.JWTKeyService
+import com.und.security.service.SecurityAuthenticationResponse
 import com.und.security.service.UserService
 import com.und.security.utils.AuthenticationUtils
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpRequest
 import org.springframework.http.ResponseEntity
-import org.springframework.mobile.device.Device
-import org.springframework.mobile.device.DeviceUtils
 import org.springframework.web.bind.annotation.*
-import sun.plugin2.main.server.JVMHealthData
-import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
 
-@CrossOrigin(origins= arrayOf("*"), maxAge = 3600)
+@CrossOrigin(origins= ["*"], maxAge = 3600)
 @RestController
 @RequestMapping("/setting")
 class UserProfileController {
@@ -34,14 +29,12 @@ class UserProfileController {
     @Autowired
     lateinit var userService: UserService
 
-    @Autowired
-    lateinit private var jwtKeyService: JWTKeyService
 
     @Autowired
     lateinit var clientService: ClientService
 
 
-    @RequestMapping(value = "/resetpassword", method = arrayOf(RequestMethod.POST))
+    @PostMapping(value = ["/resetpassword"])
     fun resetPassword(@RequestBody @Valid passwordRequest: PasswordRequest): ResponseEntity<Response> {
         val userDetails = AuthenticationUtils.principal
 
@@ -53,7 +46,7 @@ class UserProfileController {
     }
 
 
-    @RequestMapping(value = "/userDetails", method = arrayOf(RequestMethod.GET))
+    @GetMapping(value = ["/userDetails"])
     fun userDetails(): ResponseEntity<Response> {
         val clientId = AuthenticationUtils.clientID
         return if (clientId != null) {
@@ -79,7 +72,7 @@ class UserProfileController {
         }
     }
 
-    @RequestMapping(value = "/updateUserDetails", method = arrayOf(RequestMethod.POST))
+    @PostMapping(value = ["/updateUserDetails"])
     fun updateUserDetails(@Valid @RequestBody request: UserProfileRequest): ResponseEntity<Response> {
         val client = Client()
         with(client) {
@@ -94,12 +87,21 @@ class UserProfileController {
     }
 
 
-    @RequestMapping(value = "/refreshToken", method = arrayOf(RequestMethod.POST))
-    fun generateToken(): ResponseEntity<*> {
+    @PostMapping(value = ["/refreshToken/{new}"])
+    fun generateToken(@PathVariable("new") new:Boolean ): ResponseEntity<*> {
         //val device = DeviceUtils.getCurrentDevice(request)
         val user = AuthenticationUtils.principal
-        val jwt = userService.updateJwtOfEventUser( user)
-        return ResponseEntity.ok(jwt)
+        val jwt  = if(new) {
+             userService.updateJwtOfEventUser(user)
+        } else userService.retrieveJwtOfEventUser( user)
+        return  ResponseEntity.ok(
+                Response(
+                        status = ResponseStatus.SUCCESS,
+                        data = Data(SecurityAuthenticationResponse(jwt.loginKey))
+                )
+        )
     }
+
+
 
 }

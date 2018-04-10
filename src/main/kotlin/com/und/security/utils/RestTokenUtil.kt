@@ -20,13 +20,13 @@ import java.util.*
 class RestTokenUtil {
 
     @Autowired
-    lateinit private var dateUtils: DateUtils
+    private lateinit var dateUtils: DateUtils
 
     @Autowired
-    lateinit private var keyResolver: KeyResolver
+    private lateinit var keyResolver: KeyResolver
 
     @Autowired
-    lateinit private var jwtKeyService: JWTKeyService
+    private lateinit var jwtKeyService: JWTKeyService
 
     @Value("\${security.expiration}")
     private var expiration: Long = 0
@@ -93,9 +93,18 @@ class RestTokenUtil {
      * used to generate a token for keytype options,
      * user object should have, id, secret, username and password present
      */
-    fun generateJwtByUser(user: User,  keyType: KEYTYPE): UserCache {
+    fun generateJwtByUser(user: User, keyType: KEYTYPE): UserCache {
         val userDetails = RestUserFactory.create(user)
         return generateJwtByUserDetails(userDetails, keyType)
+    }
+
+    /**
+     * used to generate a token for keytype options,
+     * user object should have, id, secret, username and password present
+     */
+    fun retrieveJwtByUser(user: User, keyType: KEYTYPE): UserCache? {
+        val userDetails = RestUserFactory.create(user)
+        return if(userDetails.id!=null) getJwtIfExists(userDetails.id) else null
     }
 
     /**
@@ -118,7 +127,7 @@ class RestTokenUtil {
                     this.secret = user.secret
                     this.username = user.username
                     this.password = user.password!!
-                    this.email = user.email?: "Notfound"
+                    this.email = user.email ?: "Notfound"
                     this.clientId = "${user.clientId}"
                 }
                 jwt
@@ -132,7 +141,7 @@ class RestTokenUtil {
     }
 
 
-    inline private fun generateToken(userDetails: UndUserDetails): String {
+    private fun generateToken(userDetails: UndUserDetails): String {
 
 /*        val audience = when {
             device.isNormal -> AUDIENCE_WEB

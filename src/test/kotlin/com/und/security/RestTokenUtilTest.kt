@@ -4,7 +4,6 @@ import com.und.common.utils.DateUtils
 import com.und.security.model.AuthorityName
 import com.und.security.model.UndUserDetails
 import com.und.security.model.redis.UserCache
-import com.und.security.service.JWTKeyService
 import com.und.security.utils.KEYTYPE
 import com.und.security.utils.KeyResolver
 import com.und.security.utils.RestTokenUtil
@@ -21,7 +20,6 @@ import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.test.util.ReflectionTestUtils
-import java.util.*
 
 /**
  * Created by shiv on 21/07/17.
@@ -30,16 +28,13 @@ import java.util.*
 class RestTokenUtilTest {
 
     @Mock
-    lateinit private var dateUtilsMock: DateUtils
+    private lateinit var dateUtilsMock: DateUtils
 
     @InjectMocks
-    lateinit private var keyResolverMock: KeyResolver
+    private lateinit var keyResolverMock: KeyResolver
 
     @InjectMocks
-    lateinit private var restTokenUtil: RestTokenUtil
-
-    @Mock
-    lateinit private var jwtKeyService: JWTKeyService
+    private lateinit var restTokenUtil: RestTokenUtil
 
 
     private val secret: String = "supremeSecret"
@@ -75,7 +70,7 @@ class RestTokenUtilTest {
         `when`(dateUtilsMock.now()).thenReturn(DateUtil.now())
 
         val token = createToken()
-        val (user, jwtKey) = restTokenUtil.validateToken(token)
+        val (user, _) = restTokenUtil.validateToken(token)
         assertThat(user?.username).isEqualTo(TEST_USER)
     }
 
@@ -85,7 +80,7 @@ class RestTokenUtilTest {
     fun getRolesFromToken() {
         `when`(dateUtilsMock.now()).thenReturn(DateUtil.now())
         val token = createToken()
-        val (user, jwtKey) = restTokenUtil.validateToken(token)
+        val (user, _) = restTokenUtil.validateToken(token)
 
         assertThat(user?.authorities).isEqualTo(
                 arrayListOf(
@@ -95,20 +90,6 @@ class RestTokenUtilTest {
         )
     }
 
-    // TODO write tests
-    //
-    //    @Test
-    //    public void validateToken() throws Exception {
-    //    }
-
-    private fun createClaims(creationDate: String): Map<String, Any> {
-        val claims = HashMap<String, Any>()
-        claims.put(RestTokenUtil.CLAIM_KEY_USERNAME, TEST_USER)
-        claims.put(RestTokenUtil.CLAIM_KEY_AUDIENCE, "testAudience")
-        claims.put(RestTokenUtil.CLAIM_KEY_CREATED, DateUtil.parseDatetime(creationDate))
-        claims.put(RestTokenUtil.CLAIM_ROLES, arrayListOf(SimpleGrantedAuthority(AuthorityName.ROLE_ADMIN.name)))
-        return claims
-    }
 
     private fun createToken(): String {
         val user = UndUserDetails(
@@ -126,7 +107,7 @@ class RestTokenUtilTest {
             secret = user.secret
             password = user.password ?: ""
             clientId = "${user.clientId}"
-            email = user.email?:"not available"
+            email = user.email ?: "not available"
 
         }
         val device = DeviceMock()
@@ -140,7 +121,7 @@ class RestTokenUtilTest {
 
     companion object {
 
-        private val TEST_USER = "testUser"
+        private const val TEST_USER = "testUser"
     }
 
 }

@@ -32,18 +32,24 @@ class UserService {
 
     }
 
-    fun updateJwtOfEventUser( adminUser: UndUserDetails): Int {
+    fun updateJwtOfEventUser( adminUser: UndUserDetails): UserCache {
         //FIXME usernameFromEmailAndType method need fix and not required here
         val username = usernameFromEmailAndType(adminUser.username, 2)
         val jwt = generateJwtLogin(username)
         val updatedCount = userRepository.updateJwtOfEventUser(jwt.loginKey?:"", username)
         restTokenUtil.updateJwt(jwt)
-        return updatedCount
+        return jwt
 
     }
 
 
+    fun retrieveJwtOfEventUser( adminUser: UndUserDetails): UserCache {
+        //FIXME usernameFromEmailAndType method need fix and not required here
+        val username = usernameFromEmailAndType(adminUser.username, 2)
+        val jwt = retrieveJwtLogin(username, KEYTYPE.LOGIN)
+        return jwt?:updateJwtOfEventUser(adminUser)
 
+    }
 
     fun resetPassword(userDetails: UndUserDetails, password:String) {
         fun resetKeys(jwtToken: UserCache) {
@@ -75,6 +81,14 @@ class UserService {
         val user = findByUsername(username)
         return if (user != null) {
             restTokenUtil.generateJwtByUser(user, keytype)
+        } else UserCache()
+    }
+
+    private fun retrieveJwtLogin(username: String, keytype: KEYTYPE): UserCache? {
+        // Reload password post-security so we can generate token
+        val user = findByUsername(username)
+        return if (user != null) {
+            restTokenUtil.retrieveJwtByUser(user, keytype)
         } else UserCache()
     }
 }

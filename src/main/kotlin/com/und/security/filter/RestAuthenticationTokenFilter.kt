@@ -17,10 +17,10 @@ import javax.servlet.http.HttpServletResponse
 class RestAuthenticationTokenFilter : OncePerRequestFilter() {
 
     @Autowired
-    lateinit private var restTokenUtil: RestTokenUtil
+    lateinit  var restTokenUtil: RestTokenUtil
 
     @Value("\${security.header.token}")
-    lateinit private var tokenHeader: String
+    lateinit  var tokenHeader: String
 
 
     @Throws(ServletException::class, IOException::class)
@@ -31,7 +31,7 @@ class RestAuthenticationTokenFilter : OncePerRequestFilter() {
             logger.info("checking authentication for token $authToken ")
 
 
-            val (userDetails, jwtToken) = restTokenUtil.validateTokenForKeyType(authToken, KEYTYPE.LOGIN)
+            val (userDetails, _) = restTokenUtil.validateTokenForKeyType(authToken, KEYTYPE.LOGIN)
             if (userDetails!=null) {
                 val authentication = UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)
                 authentication.details = WebAuthenticationDetailsSource().buildDetails(request)
