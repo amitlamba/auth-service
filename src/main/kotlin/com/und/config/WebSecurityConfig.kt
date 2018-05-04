@@ -24,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.web.client.RestTemplate
 import org.springframework.cloud.client.loadbalancer.LoadBalanced
+import org.springframework.cloud.stream.annotation.EnableBinding
 import org.springframework.core.Ordered
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
@@ -33,6 +34,7 @@ import org.springframework.web.filter.CorsFilter
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableBinding(EventStream::class)
 @ComponentScan("com.und")
 class WebSecurityConfig : WebSecurityConfigurerAdapter() {
 

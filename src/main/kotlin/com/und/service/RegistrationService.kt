@@ -5,6 +5,7 @@ import com.und.exception.UndBusinessValidationException
 import com.und.model.ClientVerification
 import com.und.model.api.ValidationError
 import com.und.model.ui.RegistrationRequest
+import com.und.model.utils.Email
 import com.und.security.model.Client
 import com.und.security.model.EmailMessage
 import com.und.security.model.User
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import javax.mail.internet.InternetAddress
 
 @Service
 @Transactional
@@ -193,11 +195,12 @@ class RegistrationService {
                """.trimIndent()
         }
 
-        val message = EmailMessage(
-                subject = "Welcome To UND !!!",
-                from = "",
-                to = "",
-                body = buildMesageBody(client)
+        val message = Email(
+                clientID = 1,
+                emailSubject = "Welcome To UND !!!",
+                fromEmailAddress = InternetAddress("admin@userndot.com", "UserNDot Admin"),
+                toEmailAddresses = arrayOf(InternetAddress(client.email, client.name)),
+                emailBody = buildMesageBody(client)
 
         )
         emailService.sendEmail(message)

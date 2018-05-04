@@ -18,11 +18,11 @@ class RedisConfig {
     lateinit var host: String
 
     @Value("\${spring.redis.port}")
-    private var port: Int = 6379
+    private var port: String = "6379"
 
     @Bean
     fun connectionFactory(): RedisConnectionFactory {
-        val redisConfig = RedisStandaloneConfiguration(host, port)
+        val redisConfig = RedisStandaloneConfiguration(host, port.toInt())
         return JedisConnectionFactory(redisConfig)
     }
 

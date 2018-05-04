@@ -7,6 +7,7 @@ import com.und.model.api.Response
 import com.und.model.api.ResponseStatus
 import com.und.model.ui.PasswordRequest
 import com.und.model.ui.RegistrationRequest
+import com.und.model.utils.Email
 import com.und.security.model.EmailMessage
 import com.und.security.service.UserService
 import com.und.security.utils.KEYTYPE
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import javax.mail.internet.InternetAddress
 import javax.validation.Valid
 
 @CrossOrigin
@@ -72,14 +74,15 @@ class RegisterController {
     @GetMapping(value = ["/forgotpassword/{email:.+}"])
     fun forgotPassword(@PathVariable email: String): ResponseEntity<Response> {
         val code = userService.generateJwtForForgotPassword(email)
-        emailService.sendEmail(EmailMessage(
-                from = "",
-                to = "",
-                body = """
+        emailService.sendEmail(Email(
+                clientID = 1,
+                fromEmailAddress = InternetAddress("admin@userndot.com", "UserNDot Admin"),
+                toEmailAddresses = arrayOf(InternetAddress(email)),
+                emailBody = """
                     Hi, $//userName
                     please click http://localhost:8080/register/resetpassword/$email/${code.pswrdRstKey} to reset password
                 """.trimIndent(),
-                subject = "forgot password"
+                emailSubject = "forgot password"
 
         ))
         return if (code.pswrdRstKey.isNullOrBlank()) {
