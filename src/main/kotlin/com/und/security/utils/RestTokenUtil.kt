@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.mobile.device.Device
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.*
 
 @Component
@@ -89,14 +91,7 @@ class RestTokenUtil {
         return jwtKeyService.updateJwt(jwt)
     }
 
-    /**
-     * used to generate a token for keytype options,
-     * user object should have, id, secret, username and password present
-     */
-    fun generateJwtByUser(user: User, keyType: KEYTYPE): UserCache {
-        val userDetails = RestUserFactory.create(user)
-        return generateJwtByUserDetails(userDetails, keyType)
-    }
+
 
     /**
      * used to generate a token for keytype options,
@@ -104,7 +99,18 @@ class RestTokenUtil {
      */
     fun retrieveJwtByUser(user: User, keyType: KEYTYPE): UserCache? {
         val userDetails = RestUserFactory.create(user)
-        return if(userDetails.id!=null) getJwtIfExists(userDetails.id) else null
+        return if (userDetails.id != null) getJwtIfExists(userDetails.id) else null
+    }
+
+    /**
+     * used to generate a token for keytype options,
+     * user object should have, id, secret, username and password present
+     */
+    fun generateJwtByUser(user: User, keyType: KEYTYPE): UserCache {
+        user.userType
+        val userDetails = RestUserFactory.create(user)
+        val jwt = generateJwtByUser(userDetails, keyType)
+        return jwt
     }
 
     /**
@@ -112,62 +118,19 @@ class RestTokenUtil {
      * userDetails object should have, id, secret, username and password present
      * tries to get jwt object from cache, and updates requested key type if it exists else makes a new entry
      */
-    fun generateJwtByUserDetails(user: UndUserDetails, keyType: KEYTYPE): UserCache {
-
-        fun buildKey(): UserCache {
-            return if (user.id != null) {
-                val jwt = getJwtIfExists(user.id)
-                with(jwt) {
-                    userId = "${user.id}"
-                    when (keyType) {
-                        com.und.security.utils.KEYTYPE.LOGIN -> loginKey = generateToken(user)
-                        com.und.security.utils.KEYTYPE.PASSWORD_RESET -> pswrdRstKey = generateToken(user)
-                        com.und.security.utils.KEYTYPE.REGISTRATION -> emailRgstnKey = generateToken(user)
-                    }
-                    this.secret = user.secret
-                    this.username = user.username
-                    this.password = user.password!!
-                    this.email = user.email ?: "Notfound"
-                    this.clientId = "${user.clientId}"
-                }
-                jwt
-            } else UserCache()
-
+    fun generateJwtByUser(user: UndUserDetails, keyType: KEYTYPE): UserCache {
+        val cachedJwt = if (user.id != null) getJwtIfExists(user.id) else UserCache()
+        val jwtGenerator = if(user.userType == AuthenticationUtils.USER_TYPE_EVENT) {
+            val expirationDate = Date(Long.MAX_VALUE )
+            JWTGenerator(expirationDate, cachedJwt, user)
+        } else {
+            val expirationDate = Date(dateUtils.now().time + expiration*1000 )
+            JWTGenerator(expirationDate, cachedJwt, user)
         }
-
-        val jwt = buildKey()
+        val jwt = jwtGenerator.generateJwtByUserDetails(keyType)
         jwtKeyService.save(jwt)
         return jwt
-    }
 
-
-    private fun generateToken(userDetails: UndUserDetails): String {
-
-/*        val audience = when {
-            device.isNormal -> AUDIENCE_WEB
-            device.isMobile -> AUDIENCE_MOBILE
-            device.isTablet -> AUDIENCE_TABLET
-            else -> AUDIENCE_UNKNOWN
-        }*/
-
-        val createdDate = dateUtils.now()
-
-        val claims = mapOf(
-                CLAIM_KEY_USERNAME to userDetails.username,
-                //CLAIM_KEY_AUDIENCE to audience,
-                CLAIM_USER_ID to userDetails.id.toString(),
-                CLAIM_CLIENT_ID to userDetails.clientId.toString(),
-                CLAIM_ROLES to userDetails.authorities.map { auth -> auth.authority },
-                CLAIM_KEY_CREATED to createdDate
-        )
-
-        val expirationDate = Date(createdDate.time + expiration * 1000)
-
-        return Jwts.builder()
-                .setClaims(claims)
-                .setExpiration(expirationDate)
-                .signWith(SignatureAlgorithm.HS512, userDetails.secret)
-                .compact()
     }
 
 

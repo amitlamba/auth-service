@@ -39,7 +39,7 @@ class AuthenticationRestController {
             // Reload password post-security so we can generate token
             val user: UndUserDetails? = userDetailsService.loadUserByUsername(username) as UndUserDetails
             return if (user != null) {
-                restTokenUtil.generateJwtByUserDetails(user, KEYTYPE.LOGIN).loginKey ?: ""
+                restTokenUtil.generateJwtByUser(user, KEYTYPE.LOGIN).loginKey ?: ""
             } else ""
         }
 

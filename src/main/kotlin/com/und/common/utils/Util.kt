@@ -2,6 +2,7 @@ package com.und.common.utils
 
 import com.und.security.model.AuthorityName
 import com.und.security.service.AuthorityService
+import com.und.security.utils.AuthenticationUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -12,8 +13,8 @@ fun <T> loggerFor(clazz: Class<T>) = LoggerFactory.getLogger(clazz)
 fun Logger.debugT(msg: String) = if (isDebugEnabled) this.debug(msg) else Unit
 
 fun usernameFromEmailAndType(email: String, userType: Int) = when (userType) {
-    1 -> email
-    2 -> "event_$email"
+    AuthenticationUtils.USER_TYPE_ADMIN -> email
+    AuthenticationUtils.USER_TYPE_EVENT -> "event_$email"
     else -> throw Exception("invalid user type")
 }
 

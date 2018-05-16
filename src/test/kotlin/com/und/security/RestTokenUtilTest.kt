@@ -1,9 +1,12 @@
 package com.und.security
 
 import com.und.common.utils.DateUtils
+import com.und.repository.UserCacheRepository
 import com.und.security.model.AuthorityName
 import com.und.security.model.UndUserDetails
 import com.und.security.model.redis.UserCache
+import com.und.security.repository.UserRepository
+import com.und.security.service.JWTKeyService
 import com.und.security.utils.KEYTYPE
 import com.und.security.utils.KeyResolver
 import com.und.security.utils.RestTokenUtil
@@ -18,6 +21,7 @@ import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.test.util.ReflectionTestUtils
 
@@ -26,6 +30,7 @@ import org.springframework.test.util.ReflectionTestUtils
  */
 @RunWith(MockitoJUnitRunner::class)
 class RestTokenUtilTest {
+
 
     @Mock
     private lateinit var dateUtilsMock: DateUtils
@@ -36,6 +41,16 @@ class RestTokenUtilTest {
     @InjectMocks
     private lateinit var restTokenUtil: RestTokenUtil
 
+    @Mock
+    private lateinit var jwtKeyService: JWTKeyService
+
+
+    @Mock
+    lateinit var userCacheRepository: UserCacheRepository
+
+    @Mock
+    lateinit var userRepository: UserRepository
+
 
     private val secret: String = "supremeSecret"
 
@@ -44,8 +59,11 @@ class RestTokenUtilTest {
         MockitoAnnotations.initMocks(this)
         ReflectionTestUtils.setField(restTokenUtil, "expiration", 3600L) // one hour
         ReflectionTestUtils.setField(restTokenUtil, "keyResolver", keyResolverMock)
-        //ReflectionTestUtils.setField(restTokenUtil, "jwtKeyService", jwtKeyService)
-/*        whenever(
+        ReflectionTestUtils.setField(keyResolverMock, "jwtKeyService", jwtKeyService)
+        ReflectionTestUtils.setField(restTokenUtil, "jwtKeyService", jwtKeyService)
+        ReflectionTestUtils.setField(jwtKeyService, "userRepository", userRepository)
+        ReflectionTestUtils.setField(jwtKeyService, "userCacheRepository", userCacheRepository)
+/*       whenever(
                 keyResolverMock.resolveSigningKeyBytes(ArgumentMatchers.any<DefaultJwsHeader>(), ArgumentMatchers.any<Claims?>())).
                 thenReturn(TextCodec.BASE64.decode(secret)
                 )*/
@@ -58,8 +76,10 @@ class RestTokenUtilTest {
                 .thenReturn(DateUtil.yesterday())
                 .thenReturn(DateUtil.now())
 
-        val token = createToken()
-        val laterToken = createToken()
+
+
+        val (token, uc) = createToken()
+        val (laterToken, laterUc) = createToken()
 
         assertThat(token).isNotEqualTo(laterToken)
     }
@@ -68,8 +88,9 @@ class RestTokenUtilTest {
     @Throws(Exception::class)
     fun getUsernameFromToken() {
         `when`(dateUtilsMock.now()).thenReturn(DateUtil.now())
-
-        val token = createToken()
+        val (token, uc) = createToken()
+        `when`(jwtKeyService.getKeyIfExists(1L))
+                .thenReturn(uc)
         val (user, _) = restTokenUtil.validateToken(token)
         assertThat(user?.username).isEqualTo(TEST_USER)
     }
@@ -79,7 +100,7 @@ class RestTokenUtilTest {
     @Throws(Exception::class)
     fun getRolesFromToken() {
         `when`(dateUtilsMock.now()).thenReturn(DateUtil.now())
-        val token = createToken()
+        val (token, uc) = createToken()
         val (user, _) = restTokenUtil.validateToken(token)
 
         assertThat(user?.authorities).isEqualTo(
@@ -91,7 +112,7 @@ class RestTokenUtilTest {
     }
 
 
-    private fun createToken(): String {
+    private fun createToken(): Pair<String, UserCache> {
         val user = UndUserDetails(
                 id = 1L,
                 username = TEST_USER,
@@ -115,8 +136,8 @@ class RestTokenUtilTest {
         `when`(restTokenUtil.getJwtIfExists(user.id!!))
                 .thenReturn(jwtKey)
 
-        val jwtKeys = restTokenUtil.generateJwtByUserDetails(user, KEYTYPE.LOGIN)
-        return jwtKeys.loginKey ?: ""
+        val jwtKeys = restTokenUtil.generateJwtByUser(user, KEYTYPE.LOGIN)
+        return Pair(jwtKeys.loginKey ?: "", jwtKeys)
     }
 
     companion object {

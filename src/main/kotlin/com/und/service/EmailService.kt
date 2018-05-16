@@ -23,7 +23,6 @@ class EmailService {
     private lateinit var eventStream: EventStream
 
     fun sendEmail(email: Email){
-        //TODO implement send email through messaging
         logger.info("email being sent -------------")
 
         logger.info("from ${email.fromEmailAddress}")

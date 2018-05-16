@@ -23,9 +23,8 @@ class RestUserFactory {
                         authorities = mapToGrantedAuthorities(user.authorities),
                         enabled = user.enabled,
                         secret = user.clientSecret,
-                        key = user.key
-
-
+                        key = user.key,
+                        userType = user.userType
                 )
 
         private fun mapToGrantedAuthorities(authorities: List<Authority>): List<GrantedAuthority> {

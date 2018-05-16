@@ -1,6 +1,6 @@
 package com.und.model.ui
 
-//import javax.validation.constraints.Email
+import javax.validation.constraints.Email
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
@@ -9,7 +9,7 @@ import javax.validation.constraints.Size
 class RegistrationRequest {
 
     @NotNull
-    //@Email(message = "Email is not in valid format")
+    @Email(message = "Email is not in valid format")
     lateinit var email: String
 
     @NotNull
@@ -22,9 +22,9 @@ class RegistrationRequest {
     lateinit var name: String
 
     @Size(min = 0, max = 20, message = "Country should contain 0 to 20 characters")
-    lateinit var country: String
+    var country: String? = null
 
-    lateinit var address: String
+    var address: String? = null
 
     @Size(min = 0, max = 20, message = "Phone should contain 0 to 20 characters")
     var phone: String? = null

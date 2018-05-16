@@ -16,10 +16,10 @@ import org.springframework.stereotype.Service
 class UNDUserDetailsService : UserDetailsService {
 
     @Autowired
-    lateinit private var userRepository: UserRepository
+    private lateinit var userRepository: UserRepository
 
     @Autowired
-    lateinit private var userCacheRepository: UserCacheRepository
+    private lateinit var userCacheRepository: UserCacheRepository
 
     @Throws(UsernameNotFoundException::class)
     override fun loadUserByUsername(username: String): UserDetails {

@@ -1,5 +1,6 @@
 package com.und.security.model
 
+import com.und.security.utils.AuthenticationUtils
 import org.hibernate.annotations.ColumnDefault
 import org.hibernate.annotations.DynamicUpdate
 
@@ -27,7 +28,7 @@ class User {
     //FIXME replace user type by enum
     @Column(name = "user_type")
     @NotNull
-    var userType: Int = 1
+    var userType: Int = AuthenticationUtils.USER_TYPE_ADMIN
 
     @Column(name = "USERNAME", length = 255, unique = true)
     @NotNull

@@ -56,7 +56,7 @@ class UserProfileController {
                     lastname = client.lastname ?: "",
                     address = client.address,
                     phone = client.phone,
-                    eventUserToken = client.users.filter { it.userType == 2 }.first().key ?: ""
+                    eventUserToken = client.users.filter { it.userType == AuthenticationUtils.USER_TYPE_EVENT }.first().key ?: ""
 
             )
 

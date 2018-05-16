@@ -7,6 +7,9 @@ import org.springframework.security.core.context.SecurityContextHolder
 
 object AuthenticationUtils {
 
+    val USER_TYPE_ADMIN: Int = 1
+    val USER_TYPE_EVENT: Int = 2
+
     val isUserLoggedIn: Boolean
         get() {
             val securityContext = SecurityContextHolder.getContext() ?: return false
@@ -17,9 +20,11 @@ object AuthenticationUtils {
 
     val principal: UndUserDetails
         get() {
-            val securityContext = SecurityContextHolder.getContext() ?: throw AccessDeniedException("User is not logged in to the system.")
+            val securityContext = SecurityContextHolder.getContext()
+                    ?: throw AccessDeniedException("User is not logged in to the system.")
 
-            val authentication = securityContext.authentication ?: throw AccessDeniedException("User is not logged in to the system.")
+            val authentication = securityContext.authentication
+                    ?: throw AccessDeniedException("User is not logged in to the system.")
 
             return authentication.principal as UndUserDetails
         }

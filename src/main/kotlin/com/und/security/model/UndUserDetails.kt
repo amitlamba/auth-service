@@ -1,31 +1,26 @@
 package com.und.security.model
 
-import java.util.Date
-
 import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.userdetails.UserDetails
-
-import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.security.core.userdetails.User
 
 /**
  * Created by shiv on 21/07/17.
  */
 class UndUserDetails(
-       // @get:JsonIgnore
+        // @get:JsonIgnore
         val id: Long?,
 
-        val clientId : Long?,
+        val clientId: Long?,
 
         private val username: String,
 
-        val firstname: String?="",
+        val firstname: String? = "",
 
-        val lastname: String?="",
+        val lastname: String? = "",
 
-        private var password: String?=null,
+        private var password: String? = null,
 
-        val email: String?=null,
+        val email: String? = null,
 
         private val authorities: Collection<GrantedAuthority> = arrayListOf(),
 
@@ -33,8 +28,10 @@ class UndUserDetails(
 
         val secret: String,
 
-        val key: String?=null
-) : User(username,password,authorities) {
+        val key: String? = null,
+
+        val userType: Int? = null
+) : User(username, password, authorities) {
 
     override fun getUsername(): String {
         return username

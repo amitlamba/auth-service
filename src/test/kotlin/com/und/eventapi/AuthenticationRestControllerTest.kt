@@ -4,12 +4,16 @@ import com.und.common.utils.DateUtils
 import com.und.security.model.Authority
 import com.und.security.model.AuthorityName
 import com.und.security.model.User
+import com.und.security.repository.UserRepository
+import com.und.security.service.UNDUserDetailsService
 import com.und.security.utils.RestUserFactory
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.InjectMocks
+import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -38,15 +42,17 @@ class AuthenticationRestControllerTest {
     private lateinit var mvc: MockMvc
 
     @Autowired
-    lateinit private var context: WebApplicationContext
+    private lateinit var context: WebApplicationContext
 
 
-    @MockBean
-    lateinit private var userDetailsService: UserDetailsService
+    @Mock
+    private lateinit var userDetailsService: UNDUserDetailsService
+
+    @Mock
+    lateinit var userRepository: UserRepository
 
     @Value("\${security.header.token}")
-    lateinit private var tokenHeader: String
-
+    private lateinit var tokenHeader: String
 
 
     @Before
@@ -58,7 +64,7 @@ class AuthenticationRestControllerTest {
     }
 
     @Test
-    @Ignore
+    //@Ignore
     @WithMockUser(roles = arrayOf("USER"))
     @Throws(Exception::class)
     fun successfulToken() {
@@ -72,7 +78,7 @@ class AuthenticationRestControllerTest {
                 .andExpect(status().is2xxSuccessful)
     }
 
-     fun buildMockUser(authorityNames: AuthorityName): User {
+    fun buildMockUser(authorityNames: AuthorityName): User {
 
         val user = User()
         user.username = "username"
@@ -106,7 +112,7 @@ class AuthenticationRestControllerTest {
         val user = buildMockUser(AuthorityName.ROLE_ADMIN)
         val eventUser = RestUserFactory.create(user)
         `when`<UserDetails>(this.userDetailsService.loadUserByUsername(anyString())).thenReturn(eventUser)
-        this.mvc.perform(get("/refresh")
+        this.mvc.perform(get("/refresh/true")
                 .header(tokenHeader, user.key)
         )
                 .andExpect(status().is2xxSuccessful)
@@ -117,8 +123,8 @@ class AuthenticationRestControllerTest {
     @Throws(Exception::class)
     fun shouldGetUnauthorizedWithAnonymousUser() {
 
-        this.mvc.perform(get("/refresh"))
-                .andExpect(status().isUnauthorized)
+        this.mvc.perform(get("/refresh/true"))
+                .andExpect(status().is4xxClientError)
 
     }
 
