@@ -5,6 +5,7 @@ import com.und.security.model.UndUserDetails
 import com.und.security.model.User
 import com.und.security.model.redis.UserCache
 import com.und.security.repository.UserRepository
+import com.und.security.utils.AuthenticationUtils
 import com.und.security.utils.KEYTYPE
 import com.und.security.utils.RestTokenUtil
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,13 +20,13 @@ import org.springframework.transaction.annotation.Transactional
 class UserService {
 
     @Autowired
-    lateinit var userRepository: UserRepository
+    private lateinit var userRepository: UserRepository
 
     @Autowired
-    lateinit private var restTokenUtil: RestTokenUtil
+    private lateinit  var restTokenUtil: RestTokenUtil
 
     @Autowired
-    lateinit var passwordEncoder: PasswordEncoder
+    private lateinit var passwordEncoder: PasswordEncoder
 
     fun findByUsername(username: String): User? {
         return userRepository.findByUsername(username)
@@ -34,7 +35,7 @@ class UserService {
 
     fun updateJwtOfEventUser( adminUser: UndUserDetails): UserCache {
         //FIXME usernameFromEmailAndType method need fix and not required here
-        val username = usernameFromEmailAndType(adminUser.username, 2)
+        val username = usernameFromEmailAndType(adminUser.username, AuthenticationUtils.USER_TYPE_EVENT)
         val jwt = generateJwtLogin(username)
         val updatedCount = userRepository.updateJwtOfEventUser(jwt.loginKey?:"", username)
         restTokenUtil.updateJwt(jwt)
@@ -45,7 +46,7 @@ class UserService {
 
     fun retrieveJwtOfEventUser( adminUser: UndUserDetails): UserCache {
         //FIXME usernameFromEmailAndType method need fix and not required here
-        val username = usernameFromEmailAndType(adminUser.username, 2)
+        val username = usernameFromEmailAndType(adminUser.username, AuthenticationUtils.USER_TYPE_EVENT)
         val jwt = retrieveJwtLogin(username, KEYTYPE.LOGIN)
         return jwt?:updateJwtOfEventUser(adminUser)
 

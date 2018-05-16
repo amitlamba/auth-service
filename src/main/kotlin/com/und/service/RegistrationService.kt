@@ -11,6 +11,7 @@ import com.und.security.model.EmailMessage
 import com.und.security.model.User
 import com.und.security.service.AuthorityService
 import com.und.security.service.ClientService
+import com.und.security.utils.AuthenticationUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -59,8 +60,8 @@ class RegistrationService {
     fun register(registrationRequest: RegistrationRequest): Client {
         val client = buildClient(registrationRequest)
         client.dateCreated = client.dateModified
-        val adminUser = buildUser(registrationRequest, 1)
-        val eventUser = buildUser(registrationRequest, 2)
+        val adminUser = buildUser(registrationRequest, AuthenticationUtils.USER_TYPE_ADMIN)
+        val eventUser = buildUser(registrationRequest, AuthenticationUtils.USER_TYPE_EVENT)
         client.addUser(adminUser)
         client.addUser(eventUser)
         //FIXME no need for keeping email code here
