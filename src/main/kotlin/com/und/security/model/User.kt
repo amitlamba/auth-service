@@ -78,5 +78,5 @@ class User {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "USER_AUTHORITY", joinColumns = arrayOf(JoinColumn(name = "USER_ID", referencedColumnName = "ID")), inverseJoinColumns = arrayOf(JoinColumn(name = "AUTHORITY_ID", referencedColumnName = "ID")))
-    var authorities: List<Authority> = arrayListOf<Authority>()
+    var authorities: List<Authority> = arrayListOf()
 }

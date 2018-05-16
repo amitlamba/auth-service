@@ -13,6 +13,7 @@ import com.und.security.service.UserService
 import com.und.security.utils.AuthenticationUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
@@ -34,6 +35,7 @@ class UserProfileController {
     lateinit var clientService: ClientService
 
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping(value = ["/resetpassword"])
     fun resetPassword(@RequestBody @Valid passwordRequest: PasswordRequest): ResponseEntity<Response> {
         val userDetails = AuthenticationUtils.principal
@@ -46,6 +48,7 @@ class UserProfileController {
     }
 
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping(value = ["/userDetails"])
     fun userDetails(): ResponseEntity<Response> {
         val clientId = AuthenticationUtils.clientID
@@ -72,6 +75,7 @@ class UserProfileController {
         }
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping(value = ["/updateUserDetails"])
     fun updateUserDetails(@Valid @RequestBody request: UserProfileRequest): ResponseEntity<Response> {
         val client = Client()
@@ -87,6 +91,7 @@ class UserProfileController {
     }
 
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping(value = ["/refreshToken/{new}"])
     fun generateToken(@PathVariable("new") new:Boolean ): ResponseEntity<*> {
         //val device = DeviceUtils.getCurrentDevice(request)
