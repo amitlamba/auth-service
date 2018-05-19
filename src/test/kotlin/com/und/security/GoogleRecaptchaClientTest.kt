@@ -1,3 +1,4 @@
+/*
 package com.und.security
 
 import com.und.security.service.GoogleRecaptchaClient
@@ -15,12 +16,14 @@ class GoogleRecaptchaClientTest {
     @Autowired
     private lateinit var googleRecaptchaClient: GoogleRecaptchaClient
 
-    /*
+    */
+/*
 
             @RequestParam("secret", required = true) secret: String,
             @RequestParam("response", required = true) response: String,
             @RequestParam("ipAddress", required = false) ipAddress: String? = null,
-     */
+     *//*
+
     @Test
     fun testGoogleRecaptcha() {
         val response = googleRecaptchaClient.siteverify(
@@ -30,4 +33,4 @@ class GoogleRecaptchaClientTest {
 
         println(response)
     }
-}
+}*/

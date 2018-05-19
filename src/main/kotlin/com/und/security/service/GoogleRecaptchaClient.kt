@@ -1,3 +1,4 @@
+/*
 package com.und.security.service
 
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -44,6 +45,7 @@ data class RecaptchaRequestBody(
         var response: String
 )
 
+*/
 /*
 {
   "success": true|false,
@@ -51,7 +53,8 @@ data class RecaptchaRequestBody(
   "hostname": string,         // the hostname of the site where the reCAPTCHA was solved
   "error-codes": [...]        // optional
 }
- */
+ *//*
+
 data class RecaptchaResponse(
         val success: Boolean,
         @JsonProperty("challenge_ts")
@@ -73,4 +76,4 @@ class CoreFeignConfiguration {
     fun feignFormEncoder(): FormEncoder {
         return FormEncoder(SpringEncoder(this.messageConverters))
     }
-}
+}*/
