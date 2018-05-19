@@ -35,5 +35,5 @@ class RegistrationRequest {
     @Size(min = 0, max = 255, message = "Last Name should contain 0 to 255 characters")
     var lastName: String? = null
 
-
+    var recaptchaToken: String? = null
 }
